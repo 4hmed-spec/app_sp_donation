@@ -1,0 +1,6 @@
+{# Affiche un champ de formulaire : libellé, champ, erreurs. Utilisé par formulaire.html #}
+<div class="champ{% if champ.errors %} champ-erreur{% endif %}">
+  <label for="{{ champ.id_for_label }}">{{ champ.label }}{% if not champ.field.required %} <span class="facultatif">(facultatif)</span>{% endif %}</label>
+  {{ champ }}
+  {% for erreur in champ.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+</div>

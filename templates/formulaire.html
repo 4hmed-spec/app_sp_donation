@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+{# Formulaire public de don, en 3 blocs. Atteint en scannant le QR code de l'épicerie. #}
+{% block titre %}Déclarer un don — {{ epicerie.nom }}{% endblock %}
+
+{% block contenu %}
+<h1>Merci pour votre don&nbsp;!</h1>
+<p class="intro">Épicerie solidaire <strong>{{ epicerie.nom }}</strong> — {{ epicerie.ville }}</p>
+
+{% if form_donateur.errors or formset_objets.total_error_count or form_final.errors %}
+  <p class="alerte" role="alert">Merci de corriger les champs signalés en rouge.</p>
+{% endif %}
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {# ---------- Bloc 1 : coordonnées ---------- #}
+  <section class="bloc">
+    <h2><span class="etape">1</span> Vos coordonnées</h2>
+    {% include "_champ.html" with champ=form_donateur.prenom %}
+    {% include "_champ.html" with champ=form_donateur.nom %}
+    {% include "_champ.html" with champ=form_donateur.email %}
+    {% include "_champ.html" with champ=form_donateur.telephone %}
+    {% include "_champ.html" with champ=form_donateur.adresse %}
+    <div class="ligne-2">
+      {% include "_champ.html" with champ=form_donateur.code_postal %}
+      {% include "_champ.html" with champ=form_donateur.ville %}
+    </div>
+  </section>
+
+  {# ---------- Bloc 2 : objets donnés ---------- #}
+  <section class="bloc">
+    <h2><span class="etape">2</span> Ce que vous donnez</h2>
+    {{ formset_objets.management_form }}
+    {% for erreur in formset_objets.non_form_errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+    <div id="objets">
+      {% for form in formset_objets %}
+        {% include "_objet.html" with form=form numero=forloop.counter retirable=forloop.counter0 %}
+      {% endfor %}
+    </div>
+    {# Modèle d'un objet vide, copié par le JS quand on clique sur « + Ajouter » #}
+    <template id="modele-objet">
+      {% include "_objet.html" with form=formset_objets.empty_form numero="" retirable=True %}
+    </template>
+    <button type="button" id="ajouter-objet" class="bouton-secondaire">+ Ajouter un autre objet</button>
+  </section>
+
+  {# ---------- Bloc 3 : finalisation ---------- #}
+  <section class="bloc">
+    <h2><span class="etape">3</span> Pour finir</h2>
+    {% include "_champ.html" with champ=form_final.commentaire %}
+
+    <div class="case">
+      {{ form_final.accepte_contact }}
+      <label for="{{ form_final.accepte_contact.id_for_label }}">{{ form_final.accepte_contact.label }}</label>
+    </div>
+
+    <div class="case{% if form_final.consentement_rgpd.errors %} champ-erreur{% endif %}">
+      {{ form_final.consentement_rgpd }}
+      <label for="{{ form_final.consentement_rgpd.id_for_label }}">{{ form_final.consentement_rgpd.label }} <span class="obligatoire">*</span></label>
+    </div>
+    {% for erreur in form_final.consentement_rgpd.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+
+    {# TODO (point ouvert) : texte RGPD définitif à faire valider (responsable du  #}
+    {# traitement, durée de conservation, contact pour exercer ses droits).         #}
+    <details class="rgpd">
+      <summary>En savoir plus sur vos données</summary>
+      <p>Vos données sont utilisées uniquement par le Secours populaire français pour
+      le suivi de votre don. Elles ne sont jamais vendues ni transmises.
+      [Texte à compléter : responsable du traitement, durée de conservation, contact.]</p>
+    </details>
+
+    {# Champ piège anti-robots : invisible pour les humains #}
+    <div class="piege" aria-hidden="true">
+      <label for="{{ form_final.site_web.id_for_label }}">{{ form_final.site_web.label }}</label>
+      {{ form_final.site_web }}
+    </div>
+    {% for erreur in form_final.site_web.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+
+    <button type="submit" class="bouton-principal">Envoyer ma déclaration</button>
+  </section>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/formulaire.js' %}"></script>
+{% endblock %}

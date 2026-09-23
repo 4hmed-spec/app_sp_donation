@@ -1,0 +1,101 @@
+/*
+  Feuille de style des pages publiques.
+  Pensée « mobile d'abord » : gros champs, gros boutons, une seule colonne.
+  (Taille de police >= 16px dans les champs : évite le zoom automatique sur iPhone.)
+*/
+:root {
+  --rouge: #c8102e;        /* TODO : couleur officielle SPF à confirmer */
+  --rouge-fonce: #9e0c24;
+  --gris: #666;
+  --fond: #f5f5f5;
+  --bordure: #bbb;
+  --erreur: #b00020;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #222;
+  background: var(--fond);
+}
+
+.entete { background: var(--rouge); color: #fff; padding: 14px 16px; font-weight: 700; }
+
+.contenu { max-width: 560px; margin: 0 auto; padding: 16px; }
+
+h1 { font-size: 1.5rem; margin: 8px 0; }
+h2 { font-size: 1.2rem; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+.intro { color: var(--gris); margin-top: 0; }
+
+.etape {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--rouge); color: #fff; font-size: 1rem;
+}
+
+.bloc { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+
+/* --- Champs --- */
+.champ { margin-bottom: 14px; }
+.champ label { display: block; font-weight: 600; margin-bottom: 4px; }
+.facultatif { font-weight: 400; color: var(--gris); font-size: 0.9em; }
+.obligatoire { color: var(--erreur); }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="number"],
+select, textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  font-size: 17px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  background: #fff;
+}
+input:focus, select:focus, textarea:focus { outline: 3px solid rgba(200, 16, 46, 0.3); border-color: var(--rouge); }
+
+/* Deux champs côte à côte (code postal + ville, quantité + état) */
+.ligne-2 { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr; gap: 10px; align-items: end; }
+
+/* Cases à cocher : grande zone cliquable */
+.case { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
+.case input { width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; }
+
+/* --- Erreurs --- */
+.champ-erreur input, .champ-erreur select, .champ-erreur textarea { border: 2px solid var(--erreur); }
+.erreur { color: var(--erreur); font-size: 0.95rem; margin: 4px 0 0; }
+.alerte { background: #fde8eb; color: var(--erreur); padding: 12px; border-radius: 8px; font-weight: 600; }
+
+/* --- Objets --- */
+.objet { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 0 0 12px; }
+.objet legend { font-weight: 700; padding: 0 6px; }
+
+/* --- Boutons --- */
+.bouton-principal, .bouton-secondaire {
+  display: block; width: 100%; min-height: 52px;
+  padding: 14px; border-radius: 10px;
+  font-size: 1.1rem; font-weight: 700; text-align: center; text-decoration: none;
+  cursor: pointer;
+}
+.bouton-principal { background: var(--rouge); color: #fff; border: none; margin-top: 12px; }
+.bouton-principal:hover { background: var(--rouge-fonce); }
+.bouton-secondaire { background: #fff; color: var(--rouge); border: 2px dashed var(--rouge); }
+.bouton-secondaire[disabled] { opacity: 0.4; }
+.bouton-lien { background: none; border: none; color: var(--erreur); text-decoration: underline; font-size: 0.95rem; padding: 4px 0; cursor: pointer; }
+
+/* --- RGPD --- */
+.rgpd { font-size: 0.9rem; color: var(--gris); margin: 8px 0 12px; }
+.rgpd summary { cursor: pointer; }
+
+/* Champ piège : hors de l'écran (pas display:none, que certains robots détectent) */
+.piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* --- Page de confirmation --- */
+.confirmation { background: #fff; border-radius: 10px; padding: 24px 16px; text-align: center; }
+.coche { font-size: 3rem; color: #1a7f37; margin: 0; }
+.numero { font-size: 1.1rem; }
+.numero strong { font-size: 1.4rem; letter-spacing: 1px; }
+.petit { font-size: 0.9rem; color: var(--gris); }

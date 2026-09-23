@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{# Gabarit du PDF de l'accusé de réception (converti en PDF par xhtml2pdf, voir dons/pdf.py). #}
+{# xhtml2pdf ne comprend qu'une partie du CSS : rester sur des tableaux et des styles simples. #}
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: a4 portrait; margin: 2cm; }
+  body { font-family: Helvetica; font-size: 10pt; color: #222; }
+  h1 { font-size: 16pt; color: #c8102e; margin: 0 0 4pt 0; }
+  .sous-titre { font-size: 11pt; margin-bottom: 14pt; }
+  table { width: 100%; }
+  .infos td { vertical-align: top; padding: 2pt 4pt; }
+  .etiquette { font-weight: bold; width: 28%; }
+  .objets { margin-top: 14pt; }
+  .objets th { background-color: #eeeeee; border-bottom: 1pt solid #999; padding: 4pt; }
+  .objets td { border-bottom: 0.5pt solid #ccc; padding: 4pt; }
+  .qte { text-align: center; }
+  .mention { margin-top: 24pt; padding: 8pt; border: 1pt solid #c8102e; font-weight: bold; text-align: center; }
+  .pied { margin-top: 18pt; font-size: 8pt; color: #666; }
+</style>
+</head>
+<body>
+  {# TODO (point ouvert) : logo et mentions officielles du SPF #}
+  <p><strong>Secours populaire français</strong><br>Comité : {{ comite.nom }}</p>
+
+  <h1>Accusé de réception de don en nature</h1>
+  <p class="sous-titre">N° <strong>{{ recu.numero }}</strong> — émis le {{ recu.date_emission|date:"d/m/Y à H:i" }}</p>
+
+  <table class="infos">
+    <tr><td class="etiquette">Donateur</td>
+        <td>{{ donateur.prenom }} {{ donateur.nom }}<br>{{ donateur.email }}{% if donateur.telephone %}<br>{{ donateur.telephone }}{% endif %}
+        {% if donateur.adresse or donateur.ville %}<br>{{ donateur.adresse }} {{ donateur.code_postal }} {{ donateur.ville }}{% endif %}</td></tr>
+    <tr><td class="etiquette">Lieu de dépôt</td>
+        <td>Épicerie solidaire {{ epicerie.nom }}<br>{{ epicerie.adresse }}, {{ epicerie.code_postal }} {{ epicerie.ville }}</td></tr>
+    <tr><td class="etiquette">Date du don</td><td>{{ don.date_don|date:"d/m/Y" }}</td></tr>
+  </table>
+
+  <table class="objets" repeat="1">
+    <tr><th width="22%">Catégorie</th><th width="46%">Description</th><th width="12%" class="qte">Quantité</th><th width="20%">État</th></tr>
+    {% for ligne in lignes %}
+    <tr><td>{{ ligne.categorie.nom }}</td><td>{{ ligne.description }}</td>
+        <td class="qte">{{ ligne.quantite }}</td><td>{{ ligne.get_etat_display }}</td></tr>
+    {% endfor %}
+  </table>
+
+  {% if don.commentaire %}<p><strong>Commentaire :</strong> {{ don.commentaire|linebreaksbr }}</p>{% endif %}
+
+  <div class="mention">{{ mention_non_fiscal }}</div>
+
+  <p class="pied">Merci pour votre générosité. Document généré automatiquement.</p>
+</body>
+</html>

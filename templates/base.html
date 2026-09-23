@@ -1,0 +1,22 @@
+{% load static %}<!DOCTYPE html>
+{# Gabarit commun à toutes les pages publiques : en-tête, CSS, zone de contenu. #}
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  {# Indispensable pour un affichage correct sur téléphone #}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{% block titre %}Don au Secours populaire{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="entete">
+    {# TODO (point ouvert) : logo officiel du SPF #}
+    <span class="entete-titre">Secours populaire français</span>
+  </header>
+  <main class="contenu">
+    {% block contenu %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

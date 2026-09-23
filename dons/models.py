@@ -15,10 +15,14 @@ Schéma :
 
 import uuid
 
-from django.core.validators import MinValueValidator, RegexValidator
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+
+# Quantité maximale par ligne d'objet (évite les fautes de frappe type « 1000 »)
+QUANTITE_MAX = 99
 
 # Validateur réutilisable : un code postal français = exactement 5 chiffres
 valider_code_postal = RegexValidator(
@@ -186,10 +190,24 @@ class Don(models.Model):
     epicerie = models.ForeignKey(
         Epicerie, on_delete=models.PROTECT, related_name="dons", verbose_name="épicerie"
     )
+    # Rempli automatiquement avec la date et l'heure d'envoi du formulaire
     date_don = models.DateTimeField("date du don", default=timezone.now, db_index=True)
     commentaire = models.TextField("commentaire", blank=True)
     statut = models.CharField(
         "statut", max_length=10, choices=Statut.choices, default=Statut.DECLARE
+    )
+
+    # --- Traçabilité de la validation (remplis par l'action admin « Marquer comme validé ») ---
+    date_validation = models.DateTimeField("validé le", null=True, blank=True)
+    # PROTECT : on ne peut pas supprimer un compte qui a validé des dons.
+    # Pour retirer l'accès à un bénévole, on DÉSACTIVE son compte dans l'admin.
+    valide_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="dons_valides",
+        verbose_name="validé par",
     )
 
     class Meta:
@@ -201,6 +219,11 @@ class Don(models.Model):
             models.CheckConstraint(
                 condition=Q(statut__in=["DECLARE", "VALIDE", "ANNULE"]),
                 name="don_statut_valide",
+            ),
+            # Un don « Validé » doit obligatoirement avoir une date de validation
+            models.CheckConstraint(
+                condition=~Q(statut="VALIDE") | Q(date_validation__isnull=False),
+                name="don_valide_a_une_date_validation",
             ),
         ]
 
@@ -227,9 +250,12 @@ class LigneDon(models.Model):
         related_name="lignes",
         verbose_name="catégorie",
     )
-    description = models.CharField("description", max_length=200, blank=True)
+    # Obligatoire : on choisit une catégorie (ex. Mobilier) puis on précise (ex. « bureau gris »)
+    description = models.CharField("description", max_length=200)
     quantite = models.PositiveSmallIntegerField(
-        "quantité", default=1, validators=[MinValueValidator(1)]
+        "quantité",
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(QUANTITE_MAX)],
     )
     etat = models.CharField("état", max_length=10, choices=Etat.choices)
 
@@ -238,9 +264,10 @@ class LigneDon(models.Model):
         verbose_name_plural = "objets donnés"
         ordering = ["id"]
         constraints = [
-            # Contrainte CHECK en base : au moins 1 objet par ligne
+            # Contrainte CHECK en base : entre 1 et 99 objets par ligne
             models.CheckConstraint(
-                condition=Q(quantite__gte=1), name="lignedon_quantite_min_1"
+                condition=Q(quantite__gte=1) & Q(quantite__lte=QUANTITE_MAX),
+                name="lignedon_quantite_entre_1_et_99",
             ),
             models.CheckConstraint(
                 condition=Q(etat__in=["NEUF", "BON_ETAT", "USAGE", "A_REPARER"]),
@@ -249,9 +276,7 @@ class LigneDon(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.quantite} × {self.categorie}" + (
-            f" — {self.description}" if self.description else ""
-        )
+        return f"{self.quantite} × {self.categorie} — {self.description}"
 
 
 # =============================================================================

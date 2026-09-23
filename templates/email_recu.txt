@@ -1,0 +1,10 @@
+{% autoescape off %}Bonjour {{ don.donateur.prenom }} {{ don.donateur.nom }},
+
+Merci pour votre don déposé à l'épicerie solidaire {{ don.epicerie.nom }} ({{ don.epicerie.ville }}) le {{ don.date_don|date:"d/m/Y" }}.
+
+Vous trouverez en pièce jointe votre accusé de réception n° {{ recu.numero }}.
+
+Ce document est un accusé de réception de don en nature. Il ne constitue pas un reçu fiscal.
+
+Le Secours populaire français
+{% endautoescape %}

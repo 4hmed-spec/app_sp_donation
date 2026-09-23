@@ -1,0 +1,13 @@
+{# Bloc d'un objet donné (une ligne du formset). Sert aussi de modèle pour le JS. #}
+<fieldset class="objet">
+  <legend>Objet <span class="objet-numero">{{ numero }}</span></legend>
+  {% for cache in form.hidden_fields %}{{ cache }}{% endfor %}
+  {% for erreur in form.non_field_errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+  {% include "_champ.html" with champ=form.categorie %}
+  {% include "_champ.html" with champ=form.description %}
+  <div class="ligne-2">
+    {% include "_champ.html" with champ=form.quantite %}
+    {% include "_champ.html" with champ=form.etat %}
+  </div>
+  {% if retirable %}<button type="button" class="bouton-lien retirer-objet">Retirer cet objet</button>{% endif %}
+</fieldset>

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{# Page affichée en production (DEBUG=False) pour une adresse inconnue ou une épicerie inactive. #}
+{% block titre %}Page introuvable{% endblock %}
+{% block contenu %}
+<h1>Page introuvable</h1>
+<p>Ce formulaire n'est pas (ou plus) disponible. Merci de vous adresser à l'équipe de l'épicerie solidaire.</p>
+{% endblock %}
