@@ -1,0 +1,28 @@
+# Configuration locale et secrets : ne jamais commiter
+.env
+
+# Environnement virtuel Python
+.venv/
+venv/
+
+# Fichiers générés par Python
+__pycache__/
+*.py[cod]
+
+# Base SQLite de développement
+db.sqlite3
+db.sqlite3-journal
+
+# Fichiers statiques collectés (collectstatic) et médias
+staticfiles/
+media/
+
+# Tests / couverture
+.coverage
+htmlcov/
+
+# Éditeurs et systèmes
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
