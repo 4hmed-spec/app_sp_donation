@@ -6,7 +6,11 @@
 <div class="confirmation">
   <p class="coche" aria-hidden="true">✓</p>
   <h1>Merci {{ don.donateur.prenom }}&nbsp;!</h1>
+  {% if don.est_annule %}
+  <p class="alerte">Ce don a été annulé par le Secours populaire.</p>
+  {% else %}
   <p>Votre don a bien été enregistré.</p>
+  {% endif %}
   <p class="numero">Reçu n°<br><strong>{{ recu.numero }}</strong></p>
   <a class="bouton-principal" href="{% url 'dons:recu_pdf' jeton=don.jeton %}">Télécharger mon reçu (PDF)</a>
   <p class="petit">Un exemplaire vous est aussi envoyé à <strong>{{ don.donateur.email }}</strong>.</p>

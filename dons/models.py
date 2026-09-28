@@ -230,6 +230,10 @@ class Don(models.Model):
     def __str__(self):
         return f"Don du {self.date_don:%d/%m/%Y} — {self.donateur} — {self.epicerie.nom}"
 
+    @property
+    def est_annule(self):
+        return self.statut == self.Statut.ANNULE
+
 
 class LigneDon(models.Model):
     """Un objet (ou lot d'objets identiques) au sein d'un don."""

@@ -9,14 +9,22 @@ Fonctions principales :
 - enregistrer_don()           : crée donateur + don + lignes + reçu, tout ou rien
 - attribuer_numero_recu()     : numérotation sans trou ni doublon
 - envoyer_recu_par_email()    : envoi du PDF, appelé APRÈS le commit
+- valider_dons() / annuler_dons() : changements de statut (actions de l'admin)
+- exporter_dons_csv()         : export CSV pour Excel (une ligne par objet)
+- generer_qrcode_png()        : QR code d'une épicerie
 """
 
+import csv
 import logging
+from io import BytesIO
+
+import qrcode
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import IntegrityError, transaction
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
 
 from .models import CompteurRecu, Don, Donateur, LigneDon, Recu
@@ -174,3 +182,126 @@ def envoyer_recu_par_email(recu_id):
     # update() plutôt que save() : on ne touche qu'à ce champ
     Recu.objects.filter(pk=recu_id).update(email_envoye=True)
     return True
+
+
+# =============================================================================
+# Changements de statut (utilisés par les actions de l'admin)
+# =============================================================================
+def valider_dons(dons, utilisateur):
+    """Passe à « Validé » les dons encore « Déclarés » ; retourne le nombre modifié.
+
+    Enregistre qui a validé et quand (traçabilité). Les dons annulés ou déjà
+    validés ne sont pas touchés.
+    """
+    return dons.filter(statut=Don.Statut.DECLARE).update(
+        statut=Don.Statut.VALIDE,
+        date_validation=timezone.now(),
+        valide_par=utilisateur,
+    )
+
+
+def annuler_dons(dons):
+    """Passe à « Annulé » les dons sélectionnés ; retourne le nombre modifié.
+
+    Le don et son reçu sont conservés (jamais supprimés) : la numérotation
+    reste sans trou. La date de validation éventuelle est gardée pour l'historique.
+    """
+    return dons.exclude(statut=Don.Statut.ANNULE).update(statut=Don.Statut.ANNULE)
+
+
+# =============================================================================
+# Export CSV
+# =============================================================================
+COLONNES_CSV = [
+    "numero_recu", "date_don", "statut", "comite", "epicerie",
+    "donateur_nom", "donateur_prenom", "donateur_email", "donateur_telephone",
+    "donateur_code_postal", "donateur_ville", "accepte_contact",
+    "categorie", "description", "quantite", "etat",
+    "commentaire", "date_validation", "valide_par",
+]
+
+
+def _cellule_sure(valeur):
+    """Neutralise l'« injection de formule » : un texte saisi par un donateur
+    qui commence par = + - @ serait exécuté comme une formule par Excel.
+    On le préfixe d'une apostrophe pour qu'il reste du simple texte."""
+    if isinstance(valeur, str) and valeur[:1] in ("=", "+", "-", "@"):
+        return "'" + valeur
+    return valeur
+
+
+def _date_fr(valeur):
+    """Date/heure au format français, dans le fuseau de Paris (vide si None)."""
+    return timezone.localtime(valeur).strftime("%d/%m/%Y %H:%M") if valeur else ""
+
+
+def exporter_dons_csv(dons, sortie):
+    """Écrit dans `sortie` (fichier ou réponse HTTP) le CSV des dons donnés.
+
+    - UNE LIGNE PAR OBJET (LigneDon) : les infos du don sont répétées ;
+      c'est le format le plus simple à exploiter dans Excel / Power BI.
+    - Séparateur « ; » et BOM UTF-8 : Excel (français) ouvre le fichier
+      directement avec les bonnes colonnes et les accents corrects.
+    """
+    lignes = (
+        LigneDon.objects.filter(don__in=dons)
+        .select_related(
+            "categorie", "don__recu", "don__donateur",
+            "don__epicerie__comite", "don__valide_par",
+        )
+        .order_by("don__date_don", "don_id", "id")
+    )
+    sortie.write("\ufeff")  # BOM UTF-8 pour Excel
+    ecrivain = csv.writer(sortie, delimiter=";")
+    ecrivain.writerow(COLONNES_CSV)
+    for ligne in lignes:
+        don = ligne.don
+        donateur = don.donateur
+        valeurs = [
+            don.recu.numero,
+            _date_fr(don.date_don),
+            don.get_statut_display(),
+            don.epicerie.comite.nom,
+            don.epicerie.nom,
+            donateur.nom,
+            donateur.prenom,
+            donateur.email,
+            donateur.telephone,
+            donateur.code_postal,
+            donateur.ville,
+            "oui" if donateur.accepte_contact else "non",
+            ligne.categorie.nom,
+            ligne.description,
+            ligne.quantite,
+            ligne.get_etat_display(),
+            don.commentaire,
+            _date_fr(don.date_validation),
+            don.valide_par.get_username() if don.valide_par else "",
+        ]
+        # Le téléphone (déjà validé, ex. « +33… ») n'a pas besoin d'être neutralisé
+        ecrivain.writerow(
+            [v if col == "donateur_telephone" else _cellule_sure(v)
+             for col, v in zip(COLONNES_CSV, valeurs)]
+        )
+
+
+# =============================================================================
+# QR code d'une épicerie
+# =============================================================================
+def url_formulaire(epicerie):
+    """URL publique complète du formulaire, ex. https://dons.exemple.fr/don/paris-11/"""
+    return settings.SITE_URL + reverse("dons:formulaire", kwargs={"slug": epicerie.slug})
+
+
+def generer_qrcode_png(epicerie):
+    """Retourne l'image PNG (bytes) du QR code pointant vers le formulaire."""
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_M,  # lisible même un peu abîmé
+        box_size=12,  # taille d'un « carré » en pixels : image ~ 500 px, bonne pour l'impression
+        border=4,
+    )
+    qr.add_data(url_formulaire(epicerie))
+    qr.make(fit=True)
+    tampon = BytesIO()
+    qr.make_image(fill_color="black", back_color="white").save(tampon, format="PNG")
+    return tampon.getvalue()
