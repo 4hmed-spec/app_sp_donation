@@ -143,5 +143,9 @@ if not DEBUG:
     # Derrière le proxy HTTPS de l'hébergeur
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30  # 30 jours
+    # Volontairement non activés (avertissements W005 / W021 de « check --deploy ») :
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS et SECURE_HSTS_PRELOAD imposeraient HTTPS à
+    # TOUS les sous-domaines du domaine choisi (autres sites du SPF…). À décider
+    # avec le responsable du nom de domaine une fois l'hébergement choisi.
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
