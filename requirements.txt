@@ -4,3 +4,4 @@ django-environ>=0.12,<1   # lecture de la configuration dans .env
 psycopg[binary]>=3.2,<4   # pilote PostgreSQL (test / prod)
 xhtml2pdf>=0.2.16,<0.3    # génération des reçus PDF (100 % Python)
 qrcode[pil]>=8.0,<9       # génération des QR codes des épiceries
+pypdf>=4,<7                # lecture des PDF dans les tests automatisés
