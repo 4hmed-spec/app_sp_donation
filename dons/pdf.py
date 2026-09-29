@@ -8,6 +8,7 @@ jour (ex. si une faute dans le nom du donateur est corrigée dans l'admin).
 
 from io import BytesIO
 
+from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 
@@ -28,6 +29,13 @@ def generer_pdf_recu(recu):
         "comite": don.epicerie.comite,
         "lignes": don.lignes.select_related("categorie").all(),
         "mention_non_fiscal": MENTION_NON_FISCAL,
+        # xhtml2pdf lit les images sur le disque : on lui donne le chemin complet du logo
+        # (None si le fichier est absent : le PDF est alors généré sans logo)
+        "chemin_logo": finders.find("img/logo.png"),
+        # Police de la charte (Barlow Semi Condensed, en TTF car xhtml2pdf ne lit pas le woff2)
+        "police_normale": finders.find("fonts/barlow/ttf/BarlowSemiCondensed-Regular.ttf"),
+        "police_grasse": finders.find("fonts/barlow/ttf/BarlowSemiCondensed-Bold.ttf"),
+        "nb_objets": sum(ligne.quantite for ligne in don.lignes.all()),
     }
     html = render_to_string("recu_pdf.html", contexte)
 

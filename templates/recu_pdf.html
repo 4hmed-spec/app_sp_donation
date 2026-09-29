@@ -1,57 +1,107 @@
 <!DOCTYPE html>
 {# Gabarit du PDF de l'accusé de réception (converti en PDF par xhtml2pdf, voir dons/pdf.py). #}
-{# xhtml2pdf ne comprend qu'une partie du CSS : rester sur des tableaux et des styles simples. #}
+{# xhtml2pdf ne comprend qu'une partie du CSS : on reste sur des tableaux et des styles simples. #}
+{# Charte graphique SPF : bleu #000F9F, rouge #F11731, noir #1D1D1B, police Barlow Semi Condensed. #}
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <style>
-  @page { size: a4 portrait; margin: 2cm; }
-  body { font-family: Helvetica; font-size: 10pt; color: #222; }
-  h1 { font-size: 16pt; color: #c8102e; margin: 0 0 4pt 0; }
-  .sous-titre { font-size: 11pt; margin-bottom: 14pt; }
-  table { width: 100%; }
-  .infos td { vertical-align: top; padding: 2pt 4pt; }
-  .etiquette { font-weight: bold; width: 28%; }
-  .objets { margin-top: 14pt; }
-  .objets th { background-color: #eeeeee; border-bottom: 1pt solid #999; padding: 4pt; }
-  .objets td { border-bottom: 0.5pt solid #ccc; padding: 4pt; }
+  @page {
+    size: a4 portrait;
+    margin: 1.6cm 1.8cm 2.2cm 1.8cm;
+    @frame pied { -pdf-frame-content: pied; bottom: 0.8cm; margin-left: 1.8cm; margin-right: 1.8cm; height: 1cm; }
+  }
+  {% if police_normale and police_grasse %}
+  @font-face { font-family: Barlow; src: url("{{ police_normale }}"); }
+  @font-face { font-family: Barlow; src: url("{{ police_grasse }}"); font-weight: bold; }
+  body { font-family: Barlow; font-size: 10pt; color: #1d1d1b; }
+  {% else %}
+  body { font-family: Helvetica; font-size: 9.5pt; color: #1d1d1b; }
+  {% endif %}
+
+  .entete td { vertical-align: middle; }
+  .titre { font-size: 17pt; font-weight: bold; color: #000f9f; text-align: right; }
+  .sous-titre { font-size: 9pt; color: #5f6670; text-align: right; }
+  .numero { font-size: 12pt; font-weight: bold; color: #1d1d1b; text-align: right; }
+
+  .filet-bleu { background-color: #000f9f; height: 3pt; }
+  .filet-rouge { background-color: #f11731; height: 3pt; }
+
+  .annule { margin-top: 10pt; padding: 7pt; background-color: #f11731; color: #ffffff;
+            font-size: 13pt; font-weight: bold; text-align: center; }
+
+  .etiquette { font-size: 7.5pt; color: #5f6670; text-transform: uppercase; letter-spacing: 1pt; padding-bottom: 3pt; }
+  .bloc { vertical-align: top; padding: 8pt 10pt; background-color: #f4f5f7; }
+  .bloc strong { font-size: 10.5pt; }
+
+  .objets th { background-color: #000f9f; color: #ffffff; padding: 5pt 6pt; text-align: left; font-size: 8.5pt; }
+  .objets td { padding: 5pt 6pt; border-bottom: 0.5pt solid #d5d9df; }
   .qte { text-align: center; }
-  .mention { margin-top: 24pt; padding: 8pt; border: 1pt solid #c8102e; font-weight: bold; text-align: center; }
-  .annule { margin-bottom: 12pt; padding: 8pt; background-color: #c8102e; color: #ffffff; font-size: 16pt; font-weight: bold; text-align: center; }
-  .pied { margin-top: 18pt; font-size: 8pt; color: #666; }
+  .total td { font-weight: bold; border-bottom: none; padding-top: 6pt; }
+
+  .mention { margin-top: 18pt; padding: 8pt 10pt; border: 1pt solid #f11731; color: #1d1d1b;
+             font-weight: bold; text-align: center; }
+  .merci { margin-top: 14pt; font-size: 10pt; color: #000f9f; }
+  #pied { font-size: 7.5pt; color: #8a9099; text-align: center; }
 </style>
 </head>
 <body>
-  {# TODO (point ouvert) : logo et mentions officielles du SPF #}
-  <p><strong>Secours populaire français</strong><br>Comité : {{ comite.nom }}</p>
+
+  {# ---------- En-tête : logo à gauche, titre et numéro à droite ---------- #}
+  <table class="entete">
+    <tr>
+      <td width="32%">{% if chemin_logo %}<img src="{{ chemin_logo }}" width="120">{% else %}<strong>Secours populaire français</strong>{% endif %}</td>
+      <td width="68%">
+        <div class="titre">Accusé de réception de don en nature</div>
+        <div class="numero">N° {{ recu.numero }}</div>
+        <div class="sous-titre">Émis le {{ recu.date_emission|date:"d/m/Y à H:i" }}</div>
+      </td>
+    </tr>
+  </table>
+  <table><tr><td class="filet-bleu" width="50%"></td><td class="filet-rouge" width="50%"></td></tr></table>
 
   {% if don.est_annule %}
   <div class="annule">ANNULÉ — ce don a été annulé par le Secours populaire</div>
   {% endif %}
-  <h1>Accusé de réception de don en nature</h1>
-  <p class="sous-titre">N° <strong>{{ recu.numero }}</strong> — émis le {{ recu.date_emission|date:"d/m/Y à H:i" }}</p>
 
-  <table class="infos">
-    <tr><td class="etiquette">Donateur</td>
-        <td>{{ donateur.prenom }} {{ donateur.nom }}<br>{{ donateur.email }}{% if donateur.telephone %}<br>{{ donateur.telephone }}{% endif %}
-        {% if donateur.adresse or donateur.ville %}<br>{{ donateur.adresse }} {{ donateur.code_postal }} {{ donateur.ville }}{% endif %}</td></tr>
-    <tr><td class="etiquette">Lieu de dépôt</td>
-        <td>Épicerie solidaire {{ epicerie.nom }}<br>{{ epicerie.adresse }}, {{ epicerie.code_postal }} {{ epicerie.ville }}</td></tr>
-    <tr><td class="etiquette">Date du don</td><td>{{ don.date_don|date:"d/m/Y" }}</td></tr>
+  {# ---------- Donateur / lieu de dépôt ---------- #}
+  <table style="margin-top: 14pt;">
+    <tr>
+      <td class="bloc" width="49%">
+        <div class="etiquette">Donateur</div>
+        <strong>{{ donateur.prenom }} {{ donateur.nom }}</strong><br>
+        {{ donateur.email }}{% if donateur.telephone %}<br>{{ donateur.telephone }}{% endif %}
+        {% if donateur.adresse or donateur.ville %}<br>{{ donateur.adresse }} {{ donateur.code_postal }} {{ donateur.ville }}{% endif %}
+      </td>
+      <td width="2%"></td>
+      <td class="bloc" width="49%">
+        <div class="etiquette">Lieu de dépôt</div>
+        <strong>{{ epicerie.nom }}</strong><br>
+        {{ epicerie.adresse }}<br>{{ epicerie.code_postal }} {{ epicerie.ville }}<br>
+        {{ comite.nom }}<br>
+        Date du don : {{ don.date_don|date:"d/m/Y" }}
+      </td>
+    </tr>
   </table>
 
+  {# ---------- Objets donnés ---------- #}
+  <p class="etiquette" style="margin-top: 16pt;">Objets déposés</p>
   <table class="objets" repeat="1">
     <tr><th width="22%">Catégorie</th><th width="46%">Description</th><th width="12%" class="qte">Quantité</th><th width="20%">État</th></tr>
     {% for ligne in lignes %}
     <tr><td>{{ ligne.categorie.nom }}</td><td>{{ ligne.description }}</td>
         <td class="qte">{{ ligne.quantite }}</td><td>{{ ligne.get_etat_display }}</td></tr>
     {% endfor %}
+    <tr class="total"><td></td><td>Total</td><td class="qte">{{ nb_objets }}</td><td></td></tr>
   </table>
 
-  {% if don.commentaire %}<p><strong>Commentaire :</strong> {{ don.commentaire|linebreaksbr }}</p>{% endif %}
+  {% if don.commentaire %}<p style="margin-top: 10pt;"><strong>Commentaire :</strong> {{ don.commentaire|linebreaksbr }}</p>{% endif %}
 
   <div class="mention">{{ mention_non_fiscal }}</div>
 
-  <p class="pied">Merci pour votre générosité. Document généré automatiquement.</p>
+  <p class="merci">Merci pour votre générosité.</p>
+
+  {# TODO (point ouvert) : mentions officielles du SPF (adresse du siège, SIRET…) #}
+  <div id="pied">Secours populaire français — {{ comite.nom }} — Accusé de réception n° {{ recu.numero }} — Document généré automatiquement</div>
 </body>
 </html>

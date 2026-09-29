@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   {# Couleur de la barre du navigateur sur téléphone (à accorder avec --couleur-principale) #}
-  <meta name="theme-color" content="#e1142d">
+  <meta name="theme-color" content="#f11731">
   <title>{% block titre %}Don au Secours populaire{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -21,6 +21,9 @@
       <span class="entete-titre" hidden>Secours populaire français</span>
     </div>
   </header>
+
+  {# Zone pleine largeur optionnelle sous l'en-tête (ex. bandeau photo de la page Merci) #}
+  {% block bandeau %}{% endblock %}
 
   <main class="contenu">
     {% block contenu %}{% endblock %}

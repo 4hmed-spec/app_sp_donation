@@ -1,18 +1,58 @@
 {% extends "base.html" %}
-{# Page de confirmation, affichée après l'envoi (via une redirection). #}
+{% load static %}
+{# Page de confirmation, affichée après l'envoi du formulaire (via une redirection). #}
 {% block titre %}Merci ! — Reçu {{ recu.numero }}{% endblock %}
 
+{# ---------- Bandeau photo avec le remerciement ---------- #}
+{% block bandeau %}
+<section class="bandeau-photo" style="--photo: url('{% static 'img/benevoles.jpg' %}');">
+  <div class="bandeau-texte">
+    {% if don.est_annule %}
+      <p class="surtitre">Don annulé</p>
+      <h1>Ce don a été annulé.</h1>
+      <p>Le Secours populaire a annulé cette déclaration. Pour toute question, adressez-vous à l'équipe de {{ don.epicerie.nom }}.</p>
+    {% else %}
+      <p class="surtitre">Don enregistré</p>
+      <h1>Merci, {{ don.donateur.prenom }}.</h1>
+      <p>Vos objets vont pouvoir aider les familles accompagnées par le Secours populaire.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
 {% block contenu %}
-<div class="confirmation">
-  <p class="coche" aria-hidden="true">✓</p>
-  <h1>Merci {{ don.donateur.prenom }}&nbsp;!</h1>
-  {% if don.est_annule %}
-  <p class="alerte">Ce don a été annulé par le Secours populaire.</p>
-  {% else %}
-  <p>Votre don a bien été enregistré.</p>
-  {% endif %}
-  <p class="numero">Reçu n°<br><strong>{{ recu.numero }}</strong></p>
-  <a class="bouton-principal" href="{% url 'dons:recu_pdf' jeton=don.jeton %}">Télécharger mon reçu (PDF)</a>
-  <p class="petit">Un exemplaire vous est aussi envoyé à <strong>{{ don.donateur.email }}</strong>.</p>
-</div>
+{# ---------- Récapitulatif façon « ticket » ---------- #}
+<section class="ticket">
+  <div class="ticket-entete">
+    <span>Accusé de réception</span>
+    <strong>{{ recu.numero }}</strong>
+  </div>
+
+  <dl class="ticket-infos">
+    <div><dt>Date</dt><dd>{{ don.date_don|date:"j F Y à H\hi" }}</dd></div>
+    <div><dt>Épicerie</dt><dd>{{ don.epicerie.nom }}, {{ don.epicerie.ville }}</dd></div>
+  </dl>
+
+  <ul class="ticket-objets">
+    {% for ligne in don.lignes.all %}
+      <li>
+        <span class="ticket-quantite">{{ ligne.quantite }}</span>
+        <span class="ticket-objet">{{ ligne.description }}<small>{{ ligne.categorie.nom }} · {{ ligne.get_etat_display }}</small></span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <a class="bouton-principal" href="{% url 'dons:recu_pdf' jeton=don.jeton %}">Télécharger le reçu (PDF)</a>
+  <p class="ticket-note">Une copie est envoyée à <strong>{{ don.donateur.email }}</strong>.</p>
+</section>
+
+{# ---------- La suite ---------- #}
+{% if not don.est_annule %}
+<section class="suite">
+  <h2>Et maintenant&nbsp;?</h2>
+  <p>Vous n'avez plus rien à faire. Un ou une bénévole de l'épicerie vérifiera les objets déposés.</p>
+  <p>Gardez ce reçu&nbsp;: c'est la trace de votre don. Il ne constitue pas un reçu fiscal.</p>
+  <p><a class="lien-fleche" href="https://www.secourspopulaire.fr" target="_blank" rel="noopener">Découvrir les actions du Secours populaire</a></p>
+</section>
+{% endif %}
 {% endblock %}
