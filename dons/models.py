@@ -105,6 +105,8 @@ class CategorieObjet(models.Model):
     ordre = models.PositiveSmallIntegerField("ordre d'affichage", default=0)
     # Une catégorie inactive n'est plus proposée, mais les anciens dons la gardent
     active = models.BooleanField("active", default=True)
+    # Petit pictogramme (emoji) affiché devant le nom dans le formulaire, ex. « 🛋️ »
+    icone = models.CharField("icône", max_length=8, blank=True)
 
     class Meta:
         verbose_name = "catégorie d'objet"
@@ -113,6 +115,11 @@ class CategorieObjet(models.Model):
 
     def __str__(self):
         return self.nom
+
+    @property
+    def libelle(self):
+        """Nom précédé de l'icône, pour le formulaire (ex. « 🛋️ Mobilier »)."""
+        return f"{self.icone} {self.nom}" if self.icone else self.nom
 
 
 # =============================================================================

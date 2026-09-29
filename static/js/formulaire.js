@@ -1,5 +1,6 @@
 /*
-  Formulaire de don : bouton « + Ajouter un autre objet » et « Retirer cet objet ».
+  Formulaire de don : bouton « + Ajouter un autre objet », « Retirer » et
+  boutons − / + de la quantité.
   JavaScript simple, sans bibliothèque, sans rechargement de la page.
 
   Principe (formset Django) : chaque objet a des champs nommés objets-0-…,
@@ -42,11 +43,25 @@ document.addEventListener("DOMContentLoaded", function () {
     blocs[blocs.length - 1].querySelector("select").focus();
   });
 
-  // Un seul écouteur pour tous les boutons « Retirer » (même ceux ajoutés plus tard)
+  // Un seul écouteur pour tous les boutons des objets (même ceux ajoutés plus tard) :
+  // « Retirer », et les boutons − / + de la quantité.
   conteneur.addEventListener("click", function (evenement) {
-    if (evenement.target.classList.contains("retirer-objet")) {
-      evenement.target.closest(".objet").remove();
+    var bouton = evenement.target.closest("button");
+    if (!bouton) return;
+
+    if (bouton.classList.contains("retirer-objet")) {
+      bouton.closest(".objet").remove();
       renumeroter();
+      return;
+    }
+
+    if (bouton.classList.contains("compteur-moins") || bouton.classList.contains("compteur-plus")) {
+      var champ = bouton.parentElement.querySelector("input");
+      var mini = parseInt(champ.min, 10) || 1;
+      var maxi = parseInt(champ.max, 10) || 99;
+      var valeur = parseInt(champ.value, 10) || mini;
+      valeur += bouton.classList.contains("compteur-plus") ? 1 : -1;
+      champ.value = Math.min(maxi, Math.max(mini, valeur));
     }
   });
 

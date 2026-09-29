@@ -1,101 +1,244 @@
 /*
-  Feuille de style des pages publiques.
+  Feuille de style des pages publiques (formulaire, merci, erreurs).
   Pensée « mobile d'abord » : gros champs, gros boutons, une seule colonne.
-  (Taille de police >= 16px dans les champs : évite le zoom automatique sur iPhone.)
+
+  ► POUR APPLIQUER LA CHARTE GRAPHIQUE DU SPF : modifier uniquement les
+    couleurs du bloc « :root » ci-dessous (et la balise theme-color de base.html).
 */
+
+/* ============================================================
+   1. Couleurs et réglages globaux (À ADAPTER À LA CHARTE)
+   ============================================================ */
 :root {
-  --rouge: #c8102e;        /* TODO : couleur officielle SPF à confirmer */
-  --rouge-fonce: #9e0c24;
-  --gris: #666;
-  --fond: #f5f5f5;
-  --bordure: #bbb;
-  --erreur: #b00020;
+  --couleur-principale: #c8102e;        /* rouge : en-tête, boutons, étapes */
+  --couleur-principale-foncee: #9e0c24; /* survol des boutons */
+  --couleur-principale-claire: #fdecef; /* fonds légers (pastilles cochées, alertes) */
+  --couleur-texte: #1f2328;
+  --couleur-texte-doux: #5f6670;
+  --couleur-fond: #f4f5f7;
+  --couleur-carte: #ffffff;
+  --couleur-bordure: #c9ced6;
+  --couleur-succes: #1a7f37;
+  --couleur-erreur: #b00020;
+
+  --rayon: 12px;                          /* arrondi des cartes et champs */
+  --ombre: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --police: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }  /* « hidden » doit toujours cacher, même avec un display défini */
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: 17px;
+  font-family: var(--police);
+  font-size: 17px;          /* >= 16px : évite le zoom automatique sur iPhone */
   line-height: 1.45;
-  color: #222;
-  background: var(--fond);
+  color: var(--couleur-texte);
+  background: var(--couleur-fond);
 }
 
-.entete { background: var(--rouge); color: #fff; padding: 14px 16px; font-weight: 700; }
+/* ============================================================
+   2. En-tête, contenu, pied de page
+   ============================================================ */
+.entete {
+  background: var(--couleur-carte);
+  border-bottom: 4px solid var(--couleur-principale);
+}
+.entete-interieur {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+}
+.logo { height: 44px; width: auto; display: block; }
+.entete-titre { font-weight: 800; font-size: 1.1rem; color: var(--couleur-principale); }
 
 .contenu { max-width: 560px; margin: 0 auto; padding: 16px; }
 
-h1 { font-size: 1.5rem; margin: 8px 0; }
-h2 { font-size: 1.2rem; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
-.intro { color: var(--gris); margin-top: 0; }
-
-.etape {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--rouge); color: #fff; font-size: 1rem;
+.pied {
+  max-width: 560px;
+  margin: 8px auto 24px;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--couleur-texte-doux);
 }
 
-.bloc { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 4px 0 8px; }
+h2 { font-size: 1.2rem; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
 
-/* --- Champs --- */
+/* ============================================================
+   3. Accueil : message + carte de l'épicerie
+   ============================================================ */
+.accueil { margin-bottom: 16px; }
+.accueil-texte { margin: 0 0 12px; color: var(--couleur-texte-doux); }
+
+.carte-epicerie {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--couleur-carte);
+  border-left: 4px solid var(--couleur-principale);
+  border-radius: var(--rayon);
+  padding: 12px 14px;
+  box-shadow: var(--ombre);
+  font-size: 0.95rem;
+}
+.carte-epicerie span { color: var(--couleur-texte-doux); }
+.carte-epicerie-icone { font-size: 1.4rem; line-height: 1; }
+
+/* ============================================================
+   4. Blocs (étapes 1, 2, 3)
+   ============================================================ */
+.bloc {
+  background: var(--couleur-carte);
+  border-radius: var(--rayon);
+  padding: 18px 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--ombre);
+}
+.etape {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--couleur-principale); color: #fff;
+  font-size: 1rem; font-weight: 700;
+}
+.aide { margin: 0 0 14px 42px; font-size: 0.92rem; color: var(--couleur-texte-doux); }
+
+/* ============================================================
+   5. Champs
+   ============================================================ */
 .champ { margin-bottom: 14px; }
-.champ label { display: block; font-weight: 600; margin-bottom: 4px; }
-.facultatif { font-weight: 400; color: var(--gris); font-size: 0.9em; }
-.obligatoire { color: var(--erreur); }
+.champ label, .libelle { display: block; font-weight: 600; margin-bottom: 6px; }
+.facultatif { font-weight: 400; color: var(--couleur-texte-doux); font-size: 0.9em; }
+.obligatoire { color: var(--couleur-erreur); }
 
 input[type="text"], input[type="email"], input[type="tel"], input[type="number"],
 select, textarea {
   width: 100%;
-  min-height: 48px;
+  min-height: 50px;
   padding: 10px 12px;
-  font-size: 17px;
-  border: 1px solid var(--bordure);
-  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 10px;
   background: #fff;
 }
-input:focus, select:focus, textarea:focus { outline: 3px solid rgba(200, 16, 46, 0.3); border-color: var(--rouge); }
+textarea { min-height: 90px; resize: vertical; }
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--couleur-principale) 30%, transparent);
+  outline-offset: 1px;
+  border-color: var(--couleur-principale);
+}
+::placeholder { color: #9aa1aa; }
 
-/* Deux champs côte à côte (code postal + ville, quantité + état) */
+/* Deux champs côte à côte (code postal + ville) */
 .ligne-2 { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr; gap: 10px; align-items: end; }
 
 /* Cases à cocher : grande zone cliquable */
-.case { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
-.case input { width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; }
+.case { display: flex; align-items: flex-start; gap: 12px; margin: 14px 0; }
+.case input { width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; accent-color: var(--couleur-principale); }
 
-/* --- Erreurs --- */
-.champ-erreur input, .champ-erreur select, .champ-erreur textarea { border: 2px solid var(--erreur); }
-.erreur { color: var(--erreur); font-size: 0.95rem; margin: 4px 0 0; }
-.alerte { background: #fde8eb; color: var(--erreur); padding: 12px; border-radius: 8px; font-weight: 600; }
-
-/* --- Objets --- */
-.objet { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 0 0 12px; }
-.objet legend { font-weight: 700; padding: 0 6px; }
-
-/* --- Boutons --- */
-.bouton-principal, .bouton-secondaire {
-  display: block; width: 100%; min-height: 52px;
-  padding: 14px; border-radius: 10px;
-  font-size: 1.1rem; font-weight: 700; text-align: center; text-decoration: none;
-  cursor: pointer;
+/* ============================================================
+   6. Objets donnés
+   ============================================================ */
+.objet {
+  border: 1px solid #e3e6ea;
+  border-radius: var(--rayon);
+  padding: 12px 14px 4px;
+  margin: 0 0 12px;
+  background: #fafbfc;
 }
-.bouton-principal { background: var(--rouge); color: #fff; border: none; margin-top: 12px; }
-.bouton-principal:hover { background: var(--rouge-fonce); }
-.bouton-secondaire { background: #fff; color: var(--rouge); border: 2px dashed var(--rouge); }
-.bouton-secondaire[disabled] { opacity: 0.4; }
-.bouton-lien { background: none; border: none; color: var(--erreur); text-decoration: underline; font-size: 0.95rem; padding: 4px 0; cursor: pointer; }
+.objet-entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.objet legend { font-weight: 700; padding: 0; float: left; }  /* float : place la légende dans l'en-tête */
+.retirer-objet {
+  background: none; border: none; cursor: pointer;
+  color: var(--couleur-texte-doux); font-size: 0.9rem; padding: 6px 0;
+}
+.retirer-objet:hover { color: var(--couleur-erreur); }
 
-/* --- RGPD --- */
-.rgpd { font-size: 0.9rem; color: var(--gris); margin: 8px 0 12px; }
+/* Quantité : − [ 1 ] + */
+.compteur { display: flex; align-items: stretch; max-width: 180px; }
+.compteur input { text-align: center; border-radius: 0; min-width: 0; -moz-appearance: textfield; }
+.compteur input::-webkit-outer-spin-button,
+.compteur input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.compteur button {
+  width: 50px; flex-shrink: 0;
+  border: 1px solid var(--couleur-bordure);
+  background: #fff; color: var(--couleur-principale);
+  font-size: 1.4rem; font-weight: 700; cursor: pointer;
+}
+.compteur button:first-child { border-radius: 10px 0 0 10px; border-right: none; }
+.compteur button:last-child { border-radius: 0 10px 10px 0; border-left: none; }
+
+/* État : pastilles à toucher (les boutons radio sont cachés mais restent accessibles) */
+.choix-etat { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pastille { position: relative; margin: 0 !important; }
+.pastille input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pastille span {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 8px;
+  border: 1px solid var(--couleur-bordure); border-radius: 10px;
+  background: #fff; font-weight: 600; text-align: center; cursor: pointer;
+}
+.pastille input:checked + span {
+  border: 2px solid var(--couleur-principale);
+  background: var(--couleur-principale-claire);
+  color: var(--couleur-principale-foncee);
+}
+.pastille input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--couleur-principale) 30%, transparent); }
+
+/* ============================================================
+   7. Erreurs et alertes
+   ============================================================ */
+.champ-erreur input, .champ-erreur select, .champ-erreur textarea,
+.champ-erreur .pastille span { border-color: var(--couleur-erreur); }
+.erreur { color: var(--couleur-erreur); font-size: 0.95rem; margin: 6px 0 0; }
+.case.champ-erreur input { outline: 2px solid var(--couleur-erreur); outline-offset: 2px; }
+.alerte {
+  background: var(--couleur-principale-claire); color: var(--couleur-erreur);
+  padding: 12px 14px; border-radius: var(--rayon); font-weight: 600;
+}
+
+/* ============================================================
+   8. Boutons
+   ============================================================ */
+.bouton-principal, .bouton-secondaire {
+  display: block; width: 100%; min-height: 54px;
+  padding: 14px; border-radius: var(--rayon);
+  font: inherit; font-size: 1.1rem; font-weight: 700;
+  text-align: center; text-decoration: none; cursor: pointer;
+}
+.bouton-principal { background: var(--couleur-principale); color: #fff; border: none; margin-top: 12px; }
+.bouton-principal:hover { background: var(--couleur-principale-foncee); }
+.bouton-secondaire {
+  background: #fff; color: var(--couleur-principale);
+  border: 2px dashed var(--couleur-principale);
+}
+.bouton-secondaire:hover { background: var(--couleur-principale-claire); }
+.bouton-secondaire[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/* ============================================================
+   9. RGPD, champ piège
+   ============================================================ */
+.rgpd { font-size: 0.9rem; color: var(--couleur-texte-doux); margin: 8px 0 12px; }
 .rgpd summary { cursor: pointer; }
 
 /* Champ piège : hors de l'écran (pas display:none, que certains robots détectent) */
 .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
-/* --- Page de confirmation --- */
-.confirmation { background: #fff; border-radius: 10px; padding: 24px 16px; text-align: center; }
-.coche { font-size: 3rem; color: #1a7f37; margin: 0; }
+/* ============================================================
+   10. Page de confirmation
+   ============================================================ */
+.confirmation {
+  background: var(--couleur-carte); border-radius: var(--rayon);
+  padding: 24px 16px; text-align: center; box-shadow: var(--ombre);
+}
+.coche { font-size: 3rem; color: var(--couleur-succes); margin: 0; }
 .numero { font-size: 1.1rem; }
 .numero strong { font-size: 1.4rem; letter-spacing: 1px; }
-.petit { font-size: 0.9rem; color: var(--gris); }
+.petit { font-size: 0.9rem; color: var(--couleur-texte-doux); }

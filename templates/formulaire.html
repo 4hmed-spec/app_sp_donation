@@ -4,8 +4,18 @@
 {% block titre %}Déclarer un don — {{ epicerie.nom }}{% endblock %}
 
 {% block contenu %}
-<h1>Merci pour votre don&nbsp;!</h1>
-<p class="intro">Épicerie solidaire <strong>{{ epicerie.nom }}</strong> — {{ epicerie.ville }}</p>
+<section class="accueil">
+  <h1>Merci pour votre don&nbsp;!</h1>
+  <p class="accueil-texte">Déclarez ce que vous avez déposé&nbsp;: 2&nbsp;minutes, sans créer de compte.
+    Vous recevrez aussitôt votre accusé de réception.</p>
+  <div class="carte-epicerie">
+    <span class="carte-epicerie-icone" aria-hidden="true">📍</span>
+    <div>
+      <strong>{{ epicerie.nom }}</strong><br>
+      <span>{{ epicerie.adresse }}, {{ epicerie.code_postal }} {{ epicerie.ville }}</span>
+    </div>
+  </div>
+</section>
 
 {% if form_donateur.errors or formset_objets.total_error_count or form_final.errors %}
   <p class="alerte" role="alert">Merci de corriger les champs signalés en rouge.</p>
@@ -17,6 +27,7 @@
   {# ---------- Bloc 1 : coordonnées ---------- #}
   <section class="bloc">
     <h2><span class="etape">1</span> Vos coordonnées</h2>
+    <p class="aide">Pour vous envoyer votre accusé de réception.</p>
     {% include "_champ.html" with champ=form_donateur.prenom %}
     {% include "_champ.html" with champ=form_donateur.nom %}
     {% include "_champ.html" with champ=form_donateur.email %}
@@ -31,6 +42,7 @@
   {# ---------- Bloc 2 : objets donnés ---------- #}
   <section class="bloc">
     <h2><span class="etape">2</span> Ce que vous donnez</h2>
+    <p class="aide">Un bloc par type d'objet. Plusieurs objets identiques&nbsp;? Indiquez la quantité.</p>
     {{ formset_objets.management_form }}
     {% for erreur in formset_objets.non_form_errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
     <div id="objets">

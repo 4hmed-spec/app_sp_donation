@@ -98,15 +98,19 @@ class LigneDonForm(forms.ModelForm):
             "quantite": forms.NumberInput(
                 attrs={"min": 1, "max": QUANTITE_MAX, "inputmode": "numeric"}
             ),
+            # L'état s'affiche en gros boutons à toucher (plus simple qu'une liste sur téléphone)
+            "etat": forms.RadioSelect,
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Seules les catégories actives sont proposées, dans l'ordre choisi par la fédé
+        # Seules les catégories actives sont proposées, dans l'ordre choisi par la fédé,
+        # avec leur icône devant le nom (ex. « 🛋️ Mobilier »)
         self.fields["categorie"].queryset = CategorieObjet.objects.filter(active=True)
-        self.fields["categorie"].empty_label = "— Choisir —"
-        # Sans ça, Django pré-sélectionnerait « Neuf » : on veut un choix conscient
-        self.fields["etat"].choices = [("", "— Choisir —")] + list(LigneDon.Etat.choices)
+        self.fields["categorie"].empty_label = "— Choisir une catégorie —"
+        self.fields["categorie"].label_from_instance = lambda categorie: categorie.libelle
+        # Aucun bouton d'état n'est présélectionné : on veut un choix conscient
+        self.fields["etat"].choices = LigneDon.Etat.choices
 
     def clean_description(self):
         return self.cleaned_data["description"].strip()

@@ -441,8 +441,9 @@ Ils sont repérés dans le code par des commentaires `TODO (point ouvert)`.
 - [ ] **Texte RGPD définitif** : responsable du traitement, durée de
       conservation, contact pour exercer ses droits (`templates/formulaire.html`,
       `dons/forms.py`).
-- [ ] **Logo et mentions officielles du SPF** sur le reçu PDF et les pages
-      (`templates/recu_pdf.html`, `templates/base.html`, couleur dans `static/css/style.css`).
+- [ ] **Logo et mentions officielles du SPF** : déposer le logo dans
+      `static/img/logo.png` (il s'affiche automatiquement dans l'en-tête), et
+      reporter les couleurs de la charte dans le bloc `:root` de `static/css/style.css`.
 - [ ] **Liste définitive des catégories** (`dons/management/commands/initialiser_donnees.py`).
 - [ ] **Rôles dans le back-office** : qui valide les dons ? Un bénévole ne
       voit-il que les dons de son épicerie ? (voir l'en-tête de `dons/admin.py`).

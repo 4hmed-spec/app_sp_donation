@@ -17,20 +17,21 @@ from dons.models import CategorieObjet, Comite, Epicerie
 
 # TODO (point ouvert) : liste définitive des catégories à valider par la fédé.
 # L'ordre de cette liste = ordre d'affichage dans le formulaire.
+# (nom, icône) — l'icône est modifiable ensuite dans l'admin.
 CATEGORIES = [
-    "Mobilier",
-    "Électroménager",
-    "Vêtements",
-    "Chaussures",
-    "Linge de maison",
-    "Vaisselle",
-    "Jouets",
-    "Livres",
-    "Puériculture",
-    "Informatique",
-    "Hygiène",
-    "Alimentaire",
-    "Autre",
+    ("Mobilier", "🛋️"),
+    ("Électroménager", "🔌"),
+    ("Vêtements", "👕"),
+    ("Chaussures", "👟"),
+    ("Linge de maison", "🛏️"),
+    ("Vaisselle", "🍽️"),
+    ("Jouets", "🧸"),
+    ("Livres", "📚"),
+    ("Puériculture", "🍼"),
+    ("Informatique", "💻"),
+    ("Hygiène", "🧼"),
+    ("Alimentaire", "🥫"),
+    ("Autre", "📦"),
 ]
 
 
@@ -48,9 +49,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # --- Catégories ---
         nb_crees = 0
-        for position, nom in enumerate(CATEGORIES, start=1):
+        for position, (nom, icone) in enumerate(CATEGORIES, start=1):
             _, cree = CategorieObjet.objects.get_or_create(
-                nom=nom, defaults={"ordre": position * 10, "active": True}
+                nom=nom, defaults={"ordre": position * 10, "active": True, "icone": icone}
             )
             nb_crees += cree
         self.stdout.write(

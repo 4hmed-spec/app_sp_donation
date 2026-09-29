@@ -1,13 +1,36 @@
 {# Bloc d'un objet donné (une ligne du formset). Sert aussi de modèle pour le JS. #}
 <fieldset class="objet">
-  <legend>Objet <span class="objet-numero">{{ numero }}</span></legend>
+  <div class="objet-entete">
+    <legend>Objet <span class="objet-numero">{{ numero }}</span></legend>
+    {% if retirable %}
+      <button type="button" class="retirer-objet" aria-label="Retirer cet objet">✕ Retirer</button>
+    {% endif %}
+  </div>
   {% for cache in form.hidden_fields %}{{ cache }}{% endfor %}
   {% for erreur in form.non_field_errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+
   {% include "_champ.html" with champ=form.categorie %}
   {% include "_champ.html" with champ=form.description %}
-  <div class="ligne-2">
-    {% include "_champ.html" with champ=form.quantite %}
-    {% include "_champ.html" with champ=form.etat %}
+
+  {# Quantité : champ nombre entouré de boutons − et + (gérés par formulaire.js) #}
+  <div class="champ{% if form.quantite.errors %} champ-erreur{% endif %}">
+    <label for="{{ form.quantite.id_for_label }}">{{ form.quantite.label }}</label>
+    <div class="compteur">
+      <button type="button" class="compteur-moins" aria-label="Diminuer la quantité">−</button>
+      {{ form.quantite }}
+      <button type="button" class="compteur-plus" aria-label="Augmenter la quantité">+</button>
+    </div>
+    {% for erreur in form.quantite.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
   </div>
-  {% if retirable %}<button type="button" class="bouton-lien retirer-objet">Retirer cet objet</button>{% endif %}
+
+  {# État : gros boutons à toucher (boutons radio stylés) #}
+  <div class="champ{% if form.etat.errors %} champ-erreur{% endif %}">
+    <span class="libelle">{{ form.etat.label }}</span>
+    <div class="choix-etat" role="radiogroup" aria-label="{{ form.etat.label }}">
+      {% for option in form.etat %}
+        <label class="pastille" for="{{ option.id_for_label }}">{{ option.tag }}<span>{{ option.choice_label }}</span></label>
+      {% endfor %}
+    </div>
+    {% for erreur in form.etat.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+  </div>
 </fieldset>
