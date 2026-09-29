@@ -99,8 +99,8 @@ class EpicerieAdmin(admin.ModelAdmin):
 # =============================================================================
 @admin.register(CategorieObjet)
 class CategorieObjetAdmin(admin.ModelAdmin):
-    list_display = ["nom", "icone", "ordre", "active"]
-    list_editable = ["icone", "ordre", "active"]
+    list_display = ["nom", "ordre", "active"]
+    list_editable = ["ordre", "active"]
     search_fields = ["nom"]
 
     def has_delete_permission(self, request, obj=None):

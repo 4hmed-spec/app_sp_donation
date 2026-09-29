@@ -3,7 +3,7 @@
   <div class="objet-entete">
     <legend>Objet <span class="objet-numero">{{ numero }}</span></legend>
     {% if retirable %}
-      <button type="button" class="retirer-objet" aria-label="Retirer cet objet">✕ Retirer</button>
+      <button type="button" class="retirer-objet" aria-label="Retirer cet objet">Retirer</button>
     {% endif %}
   </div>
   {% for cache in form.hidden_fields %}{{ cache }}{% endfor %}

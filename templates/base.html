@@ -11,7 +11,8 @@
   <title>{% block titre %}Don au Secours populaire{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
+{# La photo de fond (bénévoles) est appliquée à toutes les pages via la variable --photo-fond #}
+<body style="--photo-fond: url('{% static 'img/benevoles.jpg' %}');">
   <header class="entete">
     <div class="entete-interieur">
       {# Logo officiel : déposer le fichier dans static/img/logo.png.            #}

@@ -104,11 +104,9 @@ class LigneDonForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Seules les catégories actives sont proposées, dans l'ordre choisi par la fédé,
-        # avec leur icône devant le nom (ex. « 🛋️ Mobilier »)
+        # Seules les catégories actives sont proposées, dans l'ordre choisi par la fédé
         self.fields["categorie"].queryset = CategorieObjet.objects.filter(active=True)
-        self.fields["categorie"].empty_label = "— Choisir une catégorie —"
-        self.fields["categorie"].label_from_instance = lambda categorie: categorie.libelle
+        self.fields["categorie"].empty_label = "Choisir une catégorie"
         # Aucun bouton d'état n'est présélectionné : on veut un choix conscient
         self.fields["etat"].choices = LigneDon.Etat.choices
 

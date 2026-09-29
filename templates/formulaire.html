@@ -9,7 +9,10 @@
   <p class="accueil-texte">Déclarez ce que vous avez déposé&nbsp;: 2&nbsp;minutes, sans créer de compte.
     Vous recevrez aussitôt votre accusé de réception.</p>
   <div class="carte-epicerie">
-    <span class="carte-epicerie-icone" aria-hidden="true">📍</span>
+    <svg class="carte-epicerie-icone" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
     <div>
       <strong>{{ epicerie.nom }}</strong><br>
       <span>{{ epicerie.adresse }}, {{ epicerie.code_postal }} {{ epicerie.ville }}</span>

@@ -57,6 +57,21 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }  /* « hidden » doit toujours cacher, même avec un display défini */
 
+/* Photo de fond de tout le site, en opacité réduite et fixe pendant le défilement.
+   Un calque (pseudo-élément) est utilisé plutôt que background-attachment: fixed,
+   qui ne fonctionne pas sur iPhone. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--photo-fond);
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.2;
+  filter: saturate(0.8);
+}
+
 body {
   margin: 0;
   font-family: var(--police);
@@ -124,7 +139,12 @@ h2 { font-size: 1.2rem; margin: 0 0 4px; display: flex; align-items: center; gap
   font-size: 0.95rem;
 }
 .carte-epicerie span { color: var(--couleur-texte-doux); }
-.carte-epicerie-icone { font-size: 1.4rem; line-height: 1; }
+/* Pictogramme au trait, dans l'esprit des pictogrammes de la charte */
+.carte-epicerie-icone {
+  width: 26px; height: 26px; flex-shrink: 0; margin-top: 2px;
+  fill: none; stroke: var(--couleur-secondaire); stroke-width: 1.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 
 /* ============================================================
    4. Blocs (étapes 1, 2, 3)
@@ -283,36 +303,13 @@ input:focus, select:focus, textarea:focus, button:focus-visible {
    11. Page Merci : bandeau photo, ticket, « Et maintenant ? »
    ============================================================ */
 
-/* Bandeau : la photo est en arrière-plan, en opacité réduite, et se fond
-   progressivement dans le fond de la page vers le bas. Le texte reste en bleu foncé. */
+/* Bandeau de la page Merci : grand titre posé sur la photo de fond du site */
 .bandeau-photo {
-  position: relative;
-  overflow: hidden;
-  min-height: 280px;
   display: flex;
   align-items: flex-end;
-  background: var(--couleur-fond);
-  color: var(--couleur-texte);
-}
-.bandeau-photo::before {           /* la photo, adoucie */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: var(--photo);
-  background-size: cover;
-  background-position: center 30%;
-  opacity: 0.28;
-  filter: saturate(0.85);
-}
-.bandeau-photo::after {            /* fondu vers le fond de page, pour une transition sans bord */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(244, 245, 247, 0) 35%, var(--couleur-fond) 100%);
+  min-height: 220px;
 }
 .bandeau-texte {
-  position: relative;              /* au-dessus de la photo et du fondu */
-  z-index: 1;
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
